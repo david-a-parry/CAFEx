@@ -1,0 +1,22 @@
+##fileformat=VCFv4.3
+##contig=<ID=1,length=1>
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth (reads with MQ=255 or with bad mates are filtered)">
+##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=AU,Number=2,Type=Integer,Description="Number of 'A' alleles used in tiers 1,2">
+##FORMAT=<ID=CU,Number=2,Type=Integer,Description="Number of 'C' alleles used in tiers 1,2">
+##FORMAT=<ID=GU,Number=2,Type=Integer,Description="Number of 'G' alleles used in tiers 1,2">
+##FORMAT=<ID=TU,Number=2,Type=Integer,Description="Number of 'T' alleles used in tiers 1,2">
+##FORMAT=<ID=TAR,Number=2,Type=Integer,Description="Reads strongly supporting alternate allele for tiers 1,2">
+##FORMAT=<ID=TIR,Number=2,Type=Integer,Description="Reads strongly supporting indel allele for tiers 1,2">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	Control1	Control2	Control3	Case1	Case2	Case3
+1	1	.	A	G	.	PASS	.	GT:DP:AU:CU:GU:TU:GQ	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0
+1	2	.	C	G	.	PASS	.	GT:DP:AU:CU:GU:TU:GQ	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0
+1	3	.	T	C	.	PASS	.	GT:DP:AU:CU:GU:TU:GQ	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0
+1	4	.	A	G	.	PASS	.	GT:DP:AU:CU:GU:TU:GQ	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0
+1	5	.	C	G	.	PASS	.	GT:DP:AU:CU:GU:TU:GQ	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0
+1	6	.	C	G,T	.	PASS	.	GT:DP:AU:CU:GU:TU:GQ	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0
+1	7	.	T	G	.	PASS	.	GT:DP:AU:CU:GU:TU:GQ	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0
+1	8	.	G	T	.	PASS	.	GT:DP:AU:CU:GU:TU:GQ	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0,0:0,0:0,0:0
+1	9	.	A	AT	.	PASS	.	GT:DP:TAR:TIR:GQ	0/0:0:0,0:0,0:0	0/0:0:0,0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0,0:0
+1	10	.	AC	C	.	PASS	.	GT:DP:TAR:TIR:GQ	0/0:0:0,0:0,0:0	0/0:0:0,0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0	0/0:0:0,0:0,0:0
