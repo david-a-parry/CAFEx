@@ -151,7 +151,7 @@ def get_options():
                         least one case sample use "GQ > 20". If you require 2
                         or more samples to match an expression add the minimum
                         number as the fourth part of your expression (e.g. "GQ
-                        > 20 2". If you require ALL cases to match an
+                        > 20 2"). If you require ALL cases to match an
                         expression you can use "GQ > 20 all". See the README
                         for more details.''')
     parser.add_argument('--control_expressions', nargs='+',
