@@ -2,8 +2,17 @@
 
 
 def all_bits_set(x, nbits):
-    ''' Return True if first nbits bits are set. '''
-    return all(x & 1 << y for y in range(nbits))
+    '''
+    Return True if x is equal to value of an int with first nbits set.
+
+    e.g.
+        all_bits_set(1, 1)  # evaluates to True
+        all_bits_set(2, 2)  # evaluates to False
+        all_bits_set(3, 2)  # evaluates to True
+        all_bits_set(3, 1)  # evaluates to False
+        all_bits_set(7, 3)  # evaluates to True
+    '''
+    return x == (1 << nbits) - 1
 
 
 def set_bits_in_range(nbits):
