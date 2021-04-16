@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
-import sys
 import argparse
 import logging
 import pysam
+import sys
+import time
 from case_control_filter.utils import all_bits_set, flip_bits, get_vaf_method
 from case_control_filter.genotype_filter import FormatFilter
 
 PROG_NAME = "case_control_filter"
 logger = logging.getLogger(PROG_NAME)
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter(
+    '[%(asctime)s] %(name)s - %(levelname)s - %(message)s')
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 def check_samples(vcf, samples):
@@ -53,7 +61,11 @@ def add_info_tag(vcf, tag):
 def main(vcf, case=[], control=[], output=None, ignore_genotypes=False,
          case_expressions=[], control_expressions=[], min_case_vaf=None,
          max_control_vaf=None, vaf_ratio=None, info_tag=None,
-         progress_interval=10_000):
+         progress_interval=100_000, quiet=False, debug=False):
+    if quiet:
+        logger.setLevel(logging.WARN)
+    elif debug:
+        logger.setLevel(logging.DEBUG)
     output = '-' if output is None else output
     with pysam.VariantFile(vcf) as variants:
         check_samples(variants, case + control)
@@ -66,7 +78,8 @@ def main(vcf, case=[], control=[], output=None, ignore_genotypes=False,
         if info_tag:
             add_info_tag(vcf, info_tag)
         out.header.add_meta(key=PROG_NAME,
-                            value=str.join(" ", sys.argv))
+                            value=str.join(" ", sys.argv) + "; Date=" +
+                            time.strftime("%Y-%m-%d %H:%M"))
         read, written = 0, 0
         for record in variants:
             if progress_interval and read:
@@ -179,8 +192,10 @@ def get_options():
                         the samples with the maximum VAF. VAF is calcaulted as
                         for --min_case_vaf/--max_control_vaf options.''')
     parser.add_argument('--progress_interval', type=int, metavar='N',
-                        default=10_000, help='''Report progress every N
-                        variants. Default=10_000.''')
+                        default=100_000, help='''Report progress every N
+                        variants. Default=100_000.''')
+    parser.add_argument('--quiet', action='store_true', help='''Suppress
+                        progress messages and only show warnings.''')
     return parser.parse_args()
 
 
