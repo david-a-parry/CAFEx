@@ -117,11 +117,12 @@ class FormatFilter(object):
         else:
             if number == 1:
                 if annot is not None and op(annot, value):
-                    return set_bits_in_range(len(record.alts))
+                    return set_bits_in_range(n_alts)
             else:
                 for x in annot:
                     if x is not None and op(x, value):
-                        flag |= 1 << i  # set bit if ANY value matches
+                        # set all bits if ANY value matches
+                        return set_bits_in_range(n_alts)
         return flag
 
     def filter(self, record, samples):
