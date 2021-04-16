@@ -61,7 +61,9 @@ def get_vaf_method(vcf):
             vcf = pysam.VariantFile('input.bcf')
             vaf_calc = get_vaf_method(vcf)
             for record in vcf:
-                sample_vaf = vaf_calc(record, 'Sample1', 1)
+                for i in range(1, len(record.alleles)):
+                    alt_vaf = vaf_calc(record, 'Sample1', i)
+                    # do something with alt allele VAF...
 
     '''
     if 'AD' in vcf.header.formats:
