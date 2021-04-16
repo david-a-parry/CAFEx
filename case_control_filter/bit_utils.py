@@ -16,7 +16,7 @@ def flip_bits(x, nbits):
 
 
 def highest_set_bit(x):
-    ''' Return index of highest set bit in x'''
+    ''' Return 0-based index of highest set bit in x'''
     if x == 0:
         return 0
     hsb = 0
