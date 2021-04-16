@@ -66,21 +66,26 @@ def get_vaf_method(vcf):
                     # do something with alt allele VAF...
 
     '''
+    func = None
     if 'AD' in vcf.header.formats:
         if vcf.header.formats['AD'].number == 1:  # SvABA
-            return _get_svaba_vaf
-        return _get_ad_vaf
-    if 'AU' in vcf.header.formats or 'TAR' in vcf.header.formats:  # Strelka
+            func = _get_svaba_vaf
+        else:
+            func = _get_ad_vaf
+    elif 'AU' in vcf.header.formats or 'TAR' in vcf.header.formats:  # Strelka
         # usually Strelka SNVs and Indels will be in separate VCFs
         if 'AU' in vcf.header.formats and 'TAR' in vcf.header.formats:
             # presumably combined VCF
-            return _get_strelka_vaf
+            func = _get_strelka_vaf
         elif 'AU' in vcf.header.formats:
-            return _get_strelka_snv_vaf
-        return _get_strelka_indel_vaf
-    if 'NV' in vcf.header.formats and 'NR' in vcf.header.formats:
-        return _get_platypus_vaf
-    if 'AO' in vcf.header.formats and 'RO' in vcf.header.formats:
-        return _get_freebayes_vaf
+            func = _get_strelka_snv_vaf
+        else:
+            func = _get_strelka_indel_vaf
+    elif 'NV' in vcf.header.formats and 'NR' in vcf.header.formats:
+        func = _get_platypus_vaf
+    elif 'AO' in vcf.header.formats and 'RO' in vcf.header.formats:
+        func = _get_freebayes_vaf
+    if func is not None:
+        return func
     raise ValueError("Could not identify any supported allele depth fields " +
                      "in input VCF header.")
