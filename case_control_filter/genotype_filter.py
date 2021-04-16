@@ -160,5 +160,5 @@ class FormatFilter(object):
                 for i in range(n_alts):
                     alt_f |= (alt_counts[i] >= min_smpls) << i
             flags.append(alt_f)
-        # check that ALL filter expressions were matched
+        # report whether ALL filter expressions were matched
         return flag_consensus(flags)
