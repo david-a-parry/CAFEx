@@ -4,7 +4,8 @@ import logging
 import pysam
 import sys
 import time
-from case_control_filter.utils import all_bits_set, flip_bits, get_vaf_method
+from case_control_filter.bit_utils import all_bits_set, flip_bits
+from case_control_filter.vaf import get_vaf_method
 from case_control_filter.genotype_filter import FormatFilter
 
 PROG_NAME = "case_control_filter"

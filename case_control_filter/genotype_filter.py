@@ -1,5 +1,5 @@
 import operator
-from .utils import all_bits_set, set_bits_in_range, flag_consensus
+from .bit_utils import all_bits_set, set_bits_in_range, flag_consensus
 
 ops = {
     ">": operator.gt,
