@@ -39,7 +39,7 @@ def _get_strelka_vaf(record, sample, allele):
 
 def _get_platypus_vaf(record, sample, allele):
     ad = record.samples[sample]['NV'][allele - 1]
-    dp = record.samples[sample]['NR'][0] + ad
+    dp = record.samples[sample]['NR'][allele - 1]
     return _vaf_ad_dp(ad, dp)
 
 
