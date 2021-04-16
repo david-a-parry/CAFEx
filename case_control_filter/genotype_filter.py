@@ -1,5 +1,5 @@
 import operator
-from .bit_utils import all_bits_set, set_bits_in_range, flag_consensus
+from .bit_utils import first_n_bits_set, set_first_bits, flag_consensus
 
 ops = {
     ">": operator.gt,
@@ -117,12 +117,12 @@ class FormatFilter(object):
         else:
             if number == 1:
                 if annot is not None and op(annot, value):
-                    return set_bits_in_range(n_alts)
+                    return set_first_bits(n_alts)
             else:
                 for x in annot:
                     if x is not None and op(x, value):
                         # set all bits if ANY value matches
-                        return set_bits_in_range(n_alts)
+                        return set_first_bits(n_alts)
         return flag
 
     def filter(self, record, samples):
@@ -150,7 +150,7 @@ class FormatFilter(object):
                 flt = self._check_sample(record, smp, field, op, value, number,
                                          n_alts)
                 if min_smpls == 1:
-                    if all_bits_set(flt, n_alts):
+                    if first_n_bits_set(flt, n_alts):
                         alt_f = flt
                         break
                 else:

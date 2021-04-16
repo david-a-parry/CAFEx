@@ -4,7 +4,7 @@ import logging
 import pysam
 import sys
 import time
-from case_control_filter.bit_utils import set_bits_in_range
+from case_control_filter.bit_utils import set_first_bits
 from case_control_filter.vaf import get_vaf_method
 from case_control_filter.genotype_filter import FormatFilter
 
@@ -90,7 +90,7 @@ def main(vcf, case=[], control=[], output=None, ignore_genotypes=False,
                         .format(read, written, record.chrom, record.pos))
             read += 1
             n_alts = len(record.alts)
-            filter_flag = set_bits_in_range(n_alts)  # bitwise flag per ALT
+            filter_flag = set_first_bits(n_alts)  # bitwise flag per ALT
             for alt in range(n_alts):
                 allele = alt + 1
                 if not ignore_genotypes:
