@@ -30,7 +30,7 @@ def set_bits_in_range(x, y):
         set_bits_in_range(2, 6)  # returns 60 (0b111100)
 
     '''
-    return ((1 << (x)) - 1) ^ ((1 << (y)) - 1)
+    return ((1 << x) - 1) ^ ((1 << y) - 1)
 
 
 def flip_bits(x, n):
