@@ -7,10 +7,7 @@ def all_bits_set(x, nbits):
 
 def set_bits_in_range(nbits):
     ''' Set first n bits to 1 '''
-    x = 0
-    for i in range(nbits):
-        x |= (1 << i)
-    return x
+    return int('1' * nbits, 2)
 
 
 def flip_bits(x, nbits):
