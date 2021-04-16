@@ -74,9 +74,9 @@ def main(vcf, case=[], control=[], output=None, ignore_genotypes=False,
             vaf_calculation = get_vaf_method(variants)
         case_filter = get_format_filter(variants, case_expressions)
         control_filter = get_format_filter(variants, control_expressions)
-        out = pysam.VariantFile(output, 'w', header=variants.header)
         if info_tag:
-            add_info_tag(vcf, info_tag)
+            add_info_tag(variants, info_tag)
+        out = pysam.VariantFile(output, 'w', header=variants.header)
         out.header.add_meta(key=PROG_NAME,
                             value=str.join(" ", sys.argv) + "; Date=" +
                             time.strftime("%Y-%m-%d %H:%M"))
@@ -134,6 +134,8 @@ def main(vcf, case=[], control=[], output=None, ignore_genotypes=False,
                     elif t_vafs[i] == 0.0:
                         filter_flag |= 1 << i
             if not all_bits_set(filter_flag, n_alts):
+                if info_tag:
+                    record.info[info_tag] = filter_flag
                 out.write(record)
                 written += 1
     logger.info("Finished processing {:,} variants. ".format(read) +
@@ -191,6 +193,10 @@ def get_options():
                         control samples the VAF ration will be calculated from
                         the samples with the maximum VAF. VAF is calcaulted as
                         for --min_case_vaf/--max_control_vaf options.''')
+    parser.add_argument('--info_tag', metavar='TAGNAME', help='''Add bitwise
+                        flag with this tag to the INFO field of your output. In
+                        the case of multiallelic variants the flag indicates
+                        which alleles did NOT meet all filter expressions.''')
     parser.add_argument('--progress_interval', type=int, metavar='N',
                         default=100_000, help='''Report progress every N
                         variants. Default=100_000.''')
