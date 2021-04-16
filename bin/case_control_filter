@@ -4,7 +4,7 @@ import logging
 import pysam
 import sys
 import time
-from case_control_filter.bit_utils import all_bits_set, flip_bits
+from case_control_filter.bit_utils import set_bits_in_range
 from case_control_filter.vaf import get_vaf_method
 from case_control_filter.genotype_filter import FormatFilter
 
@@ -89,52 +89,51 @@ def main(vcf, case=[], control=[], output=None, ignore_genotypes=False,
                         "{:,} variants processed, {:,} written. At {}:{}"
                         .format(read, written, record.chrom, record.pos))
             read += 1
-            filter_flag = 0  # bitwise flag per ALT allele
             n_alts = len(record.alts)
+            filter_flag = set_bits_in_range(n_alts)  # bitwise flag per ALT
             for alt in range(n_alts):
                 allele = alt + 1
                 if not ignore_genotypes:
                     if all(allele not in record.samples[x]['GT'] for x in
                            case):
-                        filter_flag |= 1 << alt  # set bit for ALT allele
+                        filter_flag &= ~(1 << alt)  # unset bit for ALT allele
                     if any(allele in record.samples[x]['GT'] for x in control):
-                        filter_flag |= 1 << alt
+                        filter_flag &= ~(1 << alt)
             # are we done already?
-            if all_bits_set(filter_flag, n_alts):
+            if not filter_flag:
                 continue
             if control_filter is not None:
-                valid_alleles = control_filter.filter(record, control)
-                filter_flag |= flip_bits(valid_alleles, n_alts)
-            if all_bits_set(filter_flag, n_alts):
+                filter_flag &= control_filter.filter(record, control)
+            if not filter_flag:
                 continue
             if case_filter is not None:
-                valid_alleles = case_filter.filter(record, case)
-                filter_flag |= flip_bits(valid_alleles, n_alts)
-            if all_bits_set(filter_flag, n_alts):
+                filter_flag &= case_filter.filter(record, case)
+            if not filter_flag:
                 continue
-            t_vafs = None
-            n_vafs = None
+            ca_vafs = None
+            co_vafs = None
             if max_control_vaf or vaf_ratio:
-                n_vafs = get_max_vafs(record, control, vaf_calculation)
+                co_vafs = get_max_vafs(record, control, vaf_calculation)
                 if max_control_vaf:
                     for i in range(n_alts):
-                        filter_flag |= (n_vafs[i] > max_control_vaf) << i
-                    if all_bits_set(filter_flag, n_alts):
+                        filter_flag &= ~((co_vafs[i] > max_control_vaf) << i)
+                    if not filter_flag:
                         continue
             if min_case_vaf or vaf_ratio:
-                t_vafs = get_max_vafs(record, case, vaf_calculation)
+                ca_vafs = get_max_vafs(record, case, vaf_calculation)
                 if min_case_vaf:
                     for i in range(n_alts):
-                        filter_flag |= (t_vafs[i] < min_case_vaf) << i
-                    if all_bits_set(filter_flag, n_alts):
+                        filter_flag &= ~((ca_vafs[i] < min_case_vaf) << i)
+                    if not filter_flag:
                         continue
             if vaf_ratio:
                 for i in range(n_alts):
-                    if n_vafs[i] > 0.0:
-                        filter_flag |= (t_vafs[i]/n_vafs[i] < vaf_ratio) << i
-                    elif t_vafs[i] == 0.0:
-                        filter_flag |= 1 << i
-            if not all_bits_set(filter_flag, n_alts):
+                    if co_vafs[i] > 0.0:
+                        filter_flag &= ~((ca_vafs[i]/co_vafs[i] < vaf_ratio)
+                                         << i)
+                    elif ca_vafs[i] == 0.0:
+                        filter_flag &= ~(1 << i)  # unset if case VAF is zero
+            if filter_flag:
                 if info_tag:
                     record.info[info_tag] = filter_flag
                 out.write(record)
@@ -195,9 +194,9 @@ def get_options():
                         the samples with the maximum VAF. VAF is calcaulted as
                         for --min_case_vaf/--max_control_vaf options.''')
     parser.add_argument('--info_tag', metavar='TAGNAME', help='''Add bitwise
-                        flag with this tag to the INFO field of your output. In
-                        the case of multiallelic variants the flag indicates
-                        which alleles did NOT meet all filter expressions.''')
+                        flag with this tag to the INFO field of your output.
+                        Bits are set in the flag indicating which ALT alleles
+                        match all parameters provided by the user.''')
     parser.add_argument('--progress_interval', type=int, metavar='N',
                         default=100_000, help='''Report progress every N
                         variants. Default=100_000.''')
