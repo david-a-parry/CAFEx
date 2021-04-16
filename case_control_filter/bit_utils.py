@@ -1,5 +1,6 @@
 '''Convenience methods for bit setting/checking.'''
 
+
 def all_bits_set(x, nbits):
     ''' Return True if first nbits bits are set. '''
     return all(x & 1 << y for y in range(nbits))
