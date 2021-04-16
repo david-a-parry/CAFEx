@@ -1,3 +1,14 @@
+'''
+Inspect a VCF header and identify (from header FORMAT fields) an appropriate
+method for calculating the variant allele frequency (VAF) for each ALT allele
+in a VCF record.
+
+The get_vaf_method function will return an appropriate function to calculate
+the VAF from a pysam VariantRecord or a ValueError if no appropriate header
+fields can be identified.
+'''
+
+
 def _vaf_ad_dp(ad, dp):
     if dp > 0.0:
         return ad/dp
@@ -52,10 +63,15 @@ def _get_freebayes_vaf(record, sample, allele):
 def get_vaf_method(vcf):
     '''
     Scan VCF header to determine which method to use to calculate VAF. Returns
-    a function to calculate VAF for given VcfRecord, sample and allele index.
+    a function to calculate VAF for given pysam.VariantRecord, sample and
+    allele index.
 
     Will use AD field if found but non-standard fields from Strelka, Platypus
-    and Freebayes are also supported.
+    and Freebayes are also supported. Returns a ValueError if no valid function
+    can be found.
+
+    Args:
+        vcf: pysam.VariantFile object
 
     Example:
             vcf = pysam.VariantFile('input.bcf')
