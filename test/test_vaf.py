@@ -54,10 +54,8 @@ def test_ad_vaf_values():
                   [0.44], [0.15], [0.5]]
     }
     records = get_variants(ad_vcf)
-    with pysam.VariantFile(ad_vcf) as vcf:
-        vaf_method = get_vaf_method(vcf)
     for c_id, exp in expected.items():
         for i, rec in enumerate(records):
             for j in range(len(rec.alts)):
-                result = vaf_method(rec, c_id, j + 1)
+                result = _get_ad_vaf(rec, c_id, j + 1)
                 assert_almost_equals(result, exp[i][j])
