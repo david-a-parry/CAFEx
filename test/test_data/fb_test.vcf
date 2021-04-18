@@ -1,5 +1,5 @@
 ##fileformat=VCFv4.3
-##contig=<ID=1,length=1>
+##contig=<ID=1,length=100>
 ##FORMAT=<ID=RO,Number=1,Type=Integer,Description="Reference allele observation count">
 ##FORMAT=<ID=AO,Number=A,Type=Integer,Description="Alternate allele observation count">
 ##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth (reads with MQ=255 or with bad mates are filtered)">

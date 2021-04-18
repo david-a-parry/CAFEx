@@ -1,5 +1,5 @@
 ##fileformat=VCFv4.3
-##contig=<ID=1,length=1>
+##contig=<ID=1,length=100>
 ##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Depth of coverage: Number of reads covering site.">
 ##FORMAT=<ID=AD,Number=1,Type=Integer,Description="Allele depth: Number of reads supporting the variant">
 ##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">
