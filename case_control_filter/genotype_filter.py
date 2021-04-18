@@ -151,8 +151,9 @@ class FormatFilter(object):
                                          n_alts)
                 if min_smpls == 1:
                     if first_n_bits_set(flt, n_alts):
-                        alt_f = flt
+                        alt_f = flt  # bail out early if all alleles pass
                         break
+                    alt_f |= flt
                 else:
                     for i in range(n_alts):
                         alt_counts[i] += flt >> i & 1
