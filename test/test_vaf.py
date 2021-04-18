@@ -14,31 +14,31 @@ svaba_vcf = os.path.join(dir_path, 'test_data', 'svaba_test.vcf')
 strelka_vcf = os.path.join(dir_path, 'test_data', 'strelka_test.vcf')
 
 
-def test_get_ad_vaf():
+def test_get_ad_vaf_method():
     with pysam.VariantFile(ad_vcf) as vcf:
         result = get_vaf_method(vcf)
         assert_equal(result, _get_ad_vaf)
 
 
-def test_get_nv_vaf():
+def test_get_nv_vaf_method():
     with pysam.VariantFile(nv_vcf) as vcf:
         result = get_vaf_method(vcf)
         assert_equal(result, _get_platypus_vaf)
 
 
-def test_get_freebayes_vaf():
+def test_get_freebayes_vaf_method():
     with pysam.VariantFile(fb_vcf) as vcf:
         result = get_vaf_method(vcf)
         assert_equal(result, _get_freebayes_vaf)
 
 
-def test_get_svaba_vaf():
+def test_get_svaba_vaf_method():
     with pysam.VariantFile(svaba_vcf) as vcf:
         result = get_vaf_method(vcf)
         assert_equal(result, _get_svaba_vaf)
 
 
-def test_get_strelka_vaf():
+def test_get_strelka_vaf_method():
     with pysam.VariantFile(strelka_vcf) as vcf:
         result = get_vaf_method(vcf)
         assert_equal(result, _get_strelka_vaf)
