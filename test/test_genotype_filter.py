@@ -1,20 +1,13 @@
 import os
 import pysam
 from nose.tools import *
+from .utils import get_variants
 from case_control_filter.genotype_filter import FormatFilter
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 ad_vcf = os.path.join(dir_path, 'test_data', 'ad_test.vcf')
 nv_vcf = os.path.join(dir_path, 'test_data', 'nv_test.vcf')
 fb_vcf = os.path.join(dir_path, 'test_data', 'fb_test.vcf')
-
-
-def _get_variants(path):
-    records = []
-    with pysam.VariantFile(path) as vcf:
-        for rec in vcf:
-            records.append(rec)
-    return records
 
 
 def _get_f_filter(expressions, vcf):
@@ -24,7 +17,7 @@ def _get_f_filter(expressions, vcf):
 
 
 def check_filters(expected, expressions, vcf=ad_vcf):
-    records = _get_variants(vcf)
+    records = get_variants(vcf)
     format_filter = _get_f_filter(expressions, vcf)
     for c_ids, exp in expected.items():
         for i, rec in enumerate(records):
