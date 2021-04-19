@@ -26,7 +26,8 @@ def check_filters(expected, expressions, vcf=ad_vcf):
 
 
 def test_gq_single():
-    expressions = ['GQ <= 50'.split()]
+    ''' Number=1 '''
+    expressions = ['GQ <= 50']
     expected = {
         ('Case1',): [1, 0, 1, 1, 0, 3, 1, 0, 1, 1],
         ('Case2',): [0, 1, 0, 1, 0, 3, 1, 1, 1, 0],
@@ -35,8 +36,44 @@ def test_gq_single():
     check_filters(expected, expressions)
 
 
+def test_ao_single():
+    ''' Number=A '''
+    expressions = ['AO > 3']
+    expected = {
+        ('Case1',): [1, 1, 1, 0, 1, 2, 1, 1, 0, 1],
+        ('Case2',): [1, 0, 1, 0, 1, 0, 0, 1, 0, 0],
+        ('Case3',): [1, 0, 1, 1, 0, 1, 1, 1, 0, 1],
+        ('Case1', 'Case2', 'Case3'): [1, 1, 1, 1, 1, 3, 1, 1, 0, 1],
+    }
+    check_filters(expected, expressions, vcf=fb_vcf)
+
+
+def test_nv_single():
+    ''' Number=. '''
+    expressions = ['NV > 3']
+    expected = {
+        ('Case1',): [1, 1, 1, 0, 1, 3, 1, 1, 0, 1],
+        ('Case2',): [1, 0, 1, 0, 1, 0, 0, 1, 0, 0],
+        ('Case3',): [1, 0, 1, 1, 0, 3, 1, 1, 0, 1],
+        ('Case1', 'Case2', 'Case3'): [1, 1, 1, 1, 1, 3, 1, 1, 0, 1],
+    }
+    check_filters(expected, expressions, vcf=nv_vcf)
+
+
+def test_ad_single():
+    ''' Number=R '''
+    expressions = ['AD > 3']
+    expected = {
+        ('Case1',): [1, 1, 1, 0, 1, 2, 1, 1, 0, 1],
+        ('Case2',): [1, 0, 1, 0, 1, 0, 0, 1, 0, 0],
+        ('Case3',): [1, 0, 1, 1, 0, 1, 1, 1, 0, 1],
+        ('Case1', 'Case2', 'Case3'): [1, 1, 1, 1, 1, 3, 1, 1, 0, 1],
+    }
+    check_filters(expected, expressions)
+
+
 def test_gq_all():
-    expressions = ['GQ <= 50 all'.split()]
+    expressions = ['GQ <= 50 all']
     expected = {
         ('Case1',): [1, 0, 1, 1, 0, 3, 1, 0, 1, 1],
         ('Case2',): [0, 1, 0, 1, 0, 3, 1, 1, 1, 0],
@@ -47,19 +84,8 @@ def test_gq_all():
     check_filters(expected, expressions)
 
 
-def test_ad_single():
-    expressions = ['AD > 3'.split()]
-    expected = {
-        ('Case1',): [1, 1, 1, 0, 1, 2, 1, 1, 0, 1],
-        ('Case2',): [1, 0, 1, 0, 1, 0, 0, 1, 0, 0],
-        ('Case3',): [1, 0, 1, 1, 0, 1, 1, 1, 0, 1],
-        ('Case1', 'Case2', 'Case3'): [1, 1, 1, 1, 1, 3, 1, 1, 0, 1],
-    }
-    check_filters(expected, expressions)
-
-
 def test_ad_multiple():
-    expressions = ['AD > 3 2'.split()]
+    expressions = ['AD > 3 2']
     expected = {
         ('Case1', 'Case2'): [1, 0, 1, 0, 1, 0, 0, 1, 0, 0],
         ('Case2', 'Case3'): [1, 0, 1, 0, 0, 0, 0, 1, 0, 0],
@@ -68,8 +94,65 @@ def test_ad_multiple():
     }
     check_filters(expected, expressions)
 
-# TODO check Number=A (e.g. 'AO' tag from Freebayes)
-# TODO check Number=. (e.g. 'NV' tag from Platypus)
+
+def test_two_expressions():
+    expressions = ['AD > 3', 'GQ > 50']
+    expected = {
+        ('Case1',): [0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
+        ('Case2',): [1, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+        ('Case3',): [1, 0, 0, 0, 0, 1, 1, 0, 0, 1],
+        ('Case1', 'Case2', 'Case3'): [1, 1, 1, 0, 1, 3, 1, 1, 0, 1],
+    }
+    check_filters(expected, expressions)
+
+
+def test_gq_or_ad():
+    expressions = ['AD > 3 or GQ > 50']
+    expected = {
+        ('Case1',): [1, 1, 1, 0, 1, 2, 1, 1, 0, 1],
+        ('Case2',): [1, 0, 1, 0, 1, 0, 0, 1, 0, 1],
+        ('Case3',): [1, 0, 1, 1, 0, 3, 1, 1, 0, 1],
+        ('Case1', 'Case2', 'Case3'): [1, 1, 1, 1, 1, 3, 1, 1, 0, 1],
+    }
+    check_filters(expected, expressions)
+
+
+def test_gq_and_ad():
+    expressions = ['AD > 3 and GQ > 50']
+    expected = {
+        ('Case1',): [0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
+        ('Case2',): [1, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+        ('Case3',): [1, 0, 0, 0, 0, 1, 1, 0, 0, 1],
+        ('Case1', 'Case2', 'Case3'): [1, 1, 1, 0, 1, 1, 1, 1, 0, 1],
+    }
+    check_filters(expected, expressions)
+
+
+def test_gq_and_ad_or_dp():
+    expressions = ['AD > 3 and GQ > 50 or DP > 20']
+    expected = {
+        ('Case1',): [0, 1, 0, 0, 1, 3, 1, 1, 0, 0],
+        ('Case2',): [1, 0, 1, 1, 1, 3, 0, 0, 1, 1],
+        ('Case3',): [1, 0, 1, 0, 0, 3, 1, 1, 0, 1],
+        ('Case1', 'Case2', 'Case3'): [1, 1, 1, 1, 1, 3, 1, 1, 1, 1],
+    }
+    check_filters(expected, expressions)
+
+
+def test_gq_and_ad_and_dp():
+    expressions = ['AD > 3 and GQ > 50 and DP > 20']
+    expected = {
+        ('Case1',): [0, 0, 0, 0, 1, 0, 0, 1, 0, 0],
+        ('Case2',): [1, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+        ('Case3',): [1, 0, 0, 0, 0, 1, 1, 0, 0, 1],
+        ('Case1', 'Case2', 'Case3'): [1, 0, 1, 0, 1, 1, 1, 1, 0, 1],
+    }
+    check_filters(expected, expressions)
+    expressions = ['AD > 3 and GQ > 50 and DP > 20 2']
+    expected = {
+        ('Case1', 'Case2', 'Case3'): [1, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+    }
+    check_filters(expected, expressions)
 
 
 if __name__ == '__main__':

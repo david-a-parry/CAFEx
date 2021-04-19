@@ -45,6 +45,7 @@ def test_get_strelka_vaf_method():
 
 
 def test_ad_vaf_values():
+    ''' VAF from AD '''
     expected = {
         'Case1': [[0.4], [0.4666666666666667], [1.0], [0.5], [1.0], [0.0, 0.5],
                   [0.9375], [1.0], [0.0], [0.5]],
@@ -58,4 +59,76 @@ def test_ad_vaf_values():
         for i, rec in enumerate(records):
             for j in range(len(rec.alts)):
                 result = _get_ad_vaf(rec, c_id, j + 1)
+                assert_almost_equals(result, exp[i][j])
+
+
+def test_fb_vaf_values():
+    ''' VAF from AO and RO '''
+    expected = {
+        'Case1': [[0.4], [0.4666666666666667], [1.0], [0.5], [1.0], [0.0, 0.5],
+                  [0.9375], [1.0], [0.0], [0.5]],
+        'Case2': [[0.5217391304347826], [0.0], [0.53125], [0.0], [1.0],
+                  [0.0, 0.0], [0.0], [0.5], [0.1], [0.0]],
+        'Case3': [[0.475], [0.0], [1.0], [0.4], [0.0], [0.5, 0.0], [1.0],
+                  [0.44], [0.15], [0.5]]
+    }
+    records = get_variants(fb_vcf)
+    for c_id, exp in expected.items():
+        for i, rec in enumerate(records):
+            for j in range(len(rec.alts)):
+                result = _get_freebayes_vaf(rec, c_id, j + 1)
+                assert_almost_equals(result, exp[i][j])
+
+
+def test_nv_vaf_values():
+    ''' VAF from NV and NR '''
+    expected = {
+        'Case1': [[0.4], [0.4666666666666667], [1.0], [0.5], [1.0], [0.0, 0.5],
+                  [0.9375], [1.0], [0.0], [0.5]],
+        'Case2': [[0.5217391304347826], [0.0], [0.53125], [0.0], [1.0],
+                  [0.0, 0.0], [0.0], [0.5], [0.1], [0.0]],
+        'Case3': [[0.475], [0.0], [1.0], [0.4], [0.0], [0.5, 0.0], [1.0],
+                  [0.44], [0.15], [0.5]]
+    }
+    records = get_variants(nv_vcf)
+    for c_id, exp in expected.items():
+        for i, rec in enumerate(records):
+            for j in range(len(rec.alts)):
+                result = _get_platypus_vaf(rec, c_id, j + 1)
+                assert_almost_equals(result, exp[i][j])
+
+
+def test_strelka_vaf_values():
+    ''' VAF from Strelka somatic VCFs '''
+    expected = {
+        'Case1': [[0.4], [0.4666666666666667], [1.0], [0.5], [1.0], [0.0, 0.5],
+                  [0.9375], [1.0], [0.0], [0.5]],
+        'Case2': [[0.5217391304347826], [0.0], [0.53125], [0.0], [1.0],
+                  [0.0, 0.0], [0.0], [0.5], [0.1], [0.0]],
+        'Case3': [[0.475], [0.0], [1.0], [0.4], [0.0], [0.5, 0.0], [1.0],
+                  [0.44], [0.15], [0.5]]
+    }
+    records = get_variants(strelka_vcf)
+    for c_id, exp in expected.items():
+        for i, rec in enumerate(records):
+            for j in range(len(rec.alts)):
+                result = _get_strelka_vaf(rec, c_id, j + 1)
+                assert_almost_equals(result, exp[i][j])
+
+
+def test_svaba_vaf_values():
+    ''' VAF from SVABa somatic indels '''
+    expected = {
+        'Case1': [[0.4], [0.4666666666666667], [1.0], [0.5], [1.0], [0.0],
+                  [0.5], [0.9375], [1.0], [0.0], [0.5]],
+        'Case2': [[0.5217391304347826], [0.0], [0.53125], [0.0], [1.0],
+                  [0.0], [0.0], [0.0], [0.5], [0.1], [0.0]],
+        'Case3': [[0.475], [0.0], [1.0], [0.4], [0.0], [0.5], [0.0], [1.0],
+                  [0.44], [0.15], [0.5]]
+    }
+    records = get_variants(svaba_vcf)
+    for c_id, exp in expected.items():
+        for i, rec in enumerate(records):
+            for j in range(len(rec.alts)):
+                result = _get_svaba_vaf(rec, c_id, j + 1)
                 assert_almost_equals(result, exp[i][j])
