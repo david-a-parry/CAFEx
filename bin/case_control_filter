@@ -29,15 +29,7 @@ def check_samples(vcf, samples):
 def get_format_filter(vcf, expressions):
     if not expressions:
         return None
-    split_exp = list()
-    for exp in expressions:
-        splt = exp.split()
-        if len(splt) < 3 or len(splt) > 4:
-            raise ValueError("Invalid expression '{}'. ".format(exp) +
-                             "Filter expressions must be three or four " +
-                             "quoted values separated by whitespace.")
-        split_exp.append(splt)
-    return FormatFilter(vcf=vcf, filters=split_exp)
+    return FormatFilter(vcf=vcf, expressions=expressions)
 
 
 def get_max_vafs(record, samples, vaf_func):
@@ -167,8 +159,10 @@ def get_options():
                         or more samples to match an expression add the minimum
                         number as the fourth part of your expression (e.g. "GQ
                         > 20 2"). If you require ALL cases to match an
-                        expression you can use "GQ > 20 all". See the README
-                        for more details.''')
+                        expression you can use "GQ > 20 all". You may also
+                        combine expressions with logical (and/or) operators.
+                        Parentheses are not supported. See the README for more
+                        details.''')
     parser.add_argument('--control_expressions', nargs='+',
                         help='''Require control sample genotypes to match
                         these expressions. The same rules apply as for

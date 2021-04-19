@@ -12,67 +12,85 @@ ops = {
     "!": operator.ne,
 }
 
+logical = {  # we use bitwise operators because we will be comparing flags
+    "and": operator.iand,
+    "&&": operator.iand,
+    "or": operator.ior,
+    "||": operator.ior,
+}
 
-class FormatFilter(object):
-    '''
-        A class for filtering on given FORMAT fields in a VCF
-    '''
 
-    def __init__(self, vcf, filters):
+class FilterExpression(object):
+    ''' A class for holding expression logic for testing genotype values'''
+
+    def __init__(self, expression, vcf):
         '''
-            Args:
-                vcf:    VariantFile object from pysam.
-
-                filters:
-                        iterable of tuples of field names, operands and values
-                        for filtering. Optional fourth parameter indicates how
-                        many samples parameter has to match (either an integer
-                        or 'all' are acceptable). By default only one sample
-                        passed to the 'filter' method needs match an
-                        expression.
-
+        Args:
+            expression:
+                Expression string that must consist of FORMAT field names,
+                operands and values for filtering. These triplets can be
+                optionally joined by 'and' or 'or' logical parameters if more
+                than one evaluation is to be performed. Optional final
+                parameter indicates how many samples must match the expression
+                (either an integer or 'all' are acceptable, defaults to 1).
         '''
-        self.vcf = vcf
-        self.metadata = self.vcf.header.formats
-        self.fields = set()
-        self.filters = self._parse_filters(filters)
+        self.expressions = []
+        self.logical_ops = []
+        self.min_samples = 1
+        self.metadata = vcf.header.formats
+        self._parse_expressions(expression)
 
-    def _parse_filters(self, filters):
+    def check_sample(self, record, smpl, n_alts):
         '''
-            Args:
-                filters:
-                    iterable of tuples of field names, operands and values for
-                    filtering. Optional fourth parameter indicates how many
-                    samples parameter has to match (either an integer or 'all'
-                    are acceptable). By default only one sample passed to the
-                    'filter' method needs match an expression.
+            Return bitwise flag indicating for each alt allele whether sample
+            call meets expression criteria.
         '''
-        f = []
-        for field, operand, value, *extra in filters:
-            exp = " ".join([field, operand, value] + extra)
-            min_matching = 1
-            if extra:
-                if extra[0].lower() == 'all':
-                    min_matching = -1
+        flags = []
+        for field, op, value, number in self.expressions:
+            if field not in record.samples[smpl]:
+                flags.append(0)
+                continue
+            flg = 0  # set nth bit to 1 if nth ALT matches expression
+            annot = record.samples[smpl][field]
+            if number == 'A' or number == 'R':
+                if number == 'R':
+                    alt_vals = annot[1:]
                 else:
-                    try:
-                        min_matching = int(extra[0])
-                    except ValueError:
-                        raise ValueError("Invalid minimum matching parameter" +
-                                         "'{}'".format(extra[0]) + "passed " +
-                                         "to expression '{}'. ".format(exp) +
-                                         "Must either be numeric or 'all'.")
-                    if min_matching < 1:
-                        raise ValueError("Invalid minimum matching parameter" +
-                                         " '{}'".format(extra[0]) + "passed " +
-                                         "to expression '{}'. ".format(exp) +
-                                         "Must be > 0.")
+                    alt_vals = annot
+                for i in range(n_alts):
+                    if alt_vals[i] is not None and op(alt_vals[i], value):
+                        flg |= 1 << i  # set bit for ALT allele
+            else:
+                if number == 1:
+                    if annot is not None and op(annot, value):
+                        flg = set_first_bits(n_alts)
+                else:
+                    for x in annot:
+                        if x is not None and op(x, value):
+                            # set all bits if ANY value matches
+                            flg = set_first_bits(n_alts)
+            flags.append(flg)
+        if len(flags) == 1:
+            return flags[0]
+        fcmp = self.logical_ops[0](flags[0], flags[1])
+        for i in range(1, len(self.logical_ops)):
+            fcmp = self.logical_ops[i](fcmp, flags[i + 1])
+        return fcmp
+
+    def _parse_expressions(self, expression):
+        split = expression.split()
+        if len(split) < 3:
+            raise ValueError("At least three whitespace-separated values are" +
+                             " required for expressions.")
+        i = 0
+        while i < len(split) - 2:
+            field, operand, value = split[i:i+3]
             try:
                 op = ops[operand]
             except KeyError:
                 raise ValueError("Unrecognised operand '{}' ".format(operand) +
-                                "in filter expression '{} {} {}'".format(
-                                field, operand, value))
+                                 "in filter expression '{} {} {}'".format(
+                                 field, operand, value))
             if field not in self.metadata:
                 raise ValueError("FORMAT field '{}' not in VCF ".format(field) +
                                  "header - can not be used for FORMAT field " +
@@ -93,44 +111,87 @@ class FormatFilter(object):
                                      "but field Type is {}".format(ftype) +
                                      "in VCF header.")
             num = self.metadata[field].number
-            f.append((field, op, value, num, min_matching))
-            self.fields.add(field)
-        return f
+            self.expressions.append((field, op, value, num))
+            if len(split) >= i + 7:  # logical operator + another expression
+                logic = split[i+3]
+                if logic not in logical:
+                    raise ValueError("Could not parse expression '{}'. "
+                                     .format(expression) + "Invalid argument" +
+                                     "'{}' at position {}. ".format(split[i+3],
+                                                                    i + 4) +
+                                     "Expected logical operator (and/or).")
+                self.logical_ops.append(logical[logic])
+                i += 4
+            elif i + 3 <= len(split) <= i + 4:  # end of expr or min match
+                i += 3
+            else:
+                raise ValueError("Hanging values at end of expression '{}'."
+                                 .format(expression))
+        if i < len(split):
+            if i != len(split) - 1:
+                raise ValueError("Hanging values at end of expression '{}'."
+                                 .format(expression))
+            if split[i].lower() == 'all':
+                min_matching = -1
+            else:
+                try:
+                    min_matching = int(split[i])
+                except ValueError:
+                    raise ValueError("Invalid minimum matching parameter" +
+                                     "'{}'".format(split[i]) + "passed " +
+                                     "to expression '{}'.".format(expression) +
+                                     " Must either be numeric or 'all'.")
+                if min_matching < 1:
+                    raise ValueError("Invalid minimum matching parameter" +
+                                     " '{}'".format(split[i]) + "passed " +
+                                     "to expression '{}'.".format(expression) +
+                                     " Must be > 0.")
+            self.min_samples = min_matching
 
-    def _check_sample(self, record, smpl, field, op, value, number, n_alts):
+
+class FormatFilter(object):
+    '''
+    A class for filtering on given FORMAT fields in a VCF
+    '''
+
+    def __init__(self, vcf, expressions):
         '''
-            Return bitwise flag indicating for each alt allele whether sample
-            call meets expression criteria.
+        Args:
+            vcf: VariantFile object from pysam.
+
+            expressions:
+                 iterable of tuples of field names, operands and values for
+                 filtering. Optional fourth parameter indicates how many
+                 samples parameter has to match (either an integer or 'all' are
+                 acceptable). By default only one sample passed to the 'filter'
+                 method needs match an expression.
+
         '''
-        if field not in record.samples[smpl]:
-            return 0
-        flag = 0  # set nth bit to 1 if nth ALT matches expression
-        annot = record.samples[smpl][field]
-        if number == 'A' or number == 'R':
-            if number == 'R':
-                alt_vals = annot[1:]
-            else:
-                alt_vals = annot
-            for i in range(n_alts):
-                if alt_vals[i] is not None and op(alt_vals[i], value):
-                    flag |= 1 << i  # set bit for ALT allele
-        else:
-            if number == 1:
-                if annot is not None and op(annot, value):
-                    return set_first_bits(n_alts)
-            else:
-                for x in annot:
-                    if x is not None and op(x, value):
-                        # set all bits if ANY value matches
-                        return set_first_bits(n_alts)
-        return flag
+        self.vcf = vcf
+        self.fields = set()
+        self.expressions = []
+        self._parse_expressions(expressions)
+
+    def _parse_expressions(self, expressions):
+        '''
+            Args:
+                expressions:
+                    iterable of tuples of field names, operands and values for
+                    filtering. Optional fourth parameter indicates how many
+                    samples parameter has to match (either an integer or 'all'
+                    are acceptable). By default only one sample passed to the
+                    'filter' method needs match an expression.
+        '''
+        f = []
+        for expression in expressions:
+            self.expressions.append(FilterExpression(expression, self.vcf))
 
     def filter(self, record, samples):
         '''
-            Read VcfRecord and returns a bitwsise flag indicating
-            whether each ALT allele meets parameters from self.filters.
+            Read VcfRecord and returns a bitwise flag indicating
+            whether each ALT allele meets parameters from self.expressions.
 
-            record:    VcfRecord to assess according to self.filters.
+            record:    VcfRecord to assess according to self.expressions.
 
             samples:   Iterable of samples to assess.
 
@@ -139,16 +200,18 @@ class FormatFilter(object):
         # array of bitwise flags, one flag per filter, bits set if allele meets
         # filter criteria
         flags = []
-        for field, op, value, number, min_smpls in self.filters:
+        for exp in self.expressions:
             alt_f = 0  # per-alt flag for this filter expression
             alt_counts = None
-            if min_smpls < 1:
+            min_smpls = 1
+            if exp.min_samples < 1:
                 min_smpls = len(samples)
+            else:
+                min_smpls = exp.min_samples
             if min_smpls > 1:
                 alt_counts = [0] * n_alts
             for smp in samples:
-                flt = self._check_sample(record, smp, field, op, value, number,
-                                         n_alts)
+                flt = exp.check_sample(record, smp, n_alts)
                 if min_smpls == 1:
                     if first_n_bits_set(flt, n_alts):
                         alt_f = flt  # bail out early if all alleles pass
