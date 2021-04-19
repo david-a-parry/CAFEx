@@ -10,14 +10,17 @@ fields can be identified.
 
 
 def _vaf_ad_dp(ad, dp):
-    if dp > 0.0:
+    if dp > 0.0 and ad is not None:
         return ad/dp
     return 0.0
 
 
 def _get_ad_vaf(record, sample, allele):
-    ad = record.samples[sample]['AD']
-    dp = sum(ad)
+    try:
+        ad = record.samples[sample]['AD']
+        dp = sum(filter(None, ad))
+    except IndexError:  # no-calls may only have one value even if >1 ALTs
+        return 0.0
     return _vaf_ad_dp(ad[allele], dp)
 
 
@@ -49,14 +52,20 @@ def _get_strelka_vaf(record, sample, allele):
 
 
 def _get_platypus_vaf(record, sample, allele):
-    ad = record.samples[sample]['NV'][allele - 1]
-    dp = record.samples[sample]['NR'][allele - 1]
+    try:
+        ad = record.samples[sample]['NV'][allele - 1]
+        dp = record.samples[sample]['NR'][allele - 1]
+    except IndexError:  # no-calls will only have one value even if >1 ALTs
+        return 0.0
     return _vaf_ad_dp(ad, dp)
 
 
 def _get_freebayes_vaf(record, sample, allele):
-    ad = record.samples[sample]['AO'][allele - 1]
-    dp = record.samples[sample]['RO'][0] + ad
+    try:
+        ad = record.samples[sample]['AO'][allele - 1]
+        dp = record.samples[sample]['RO'] + ad
+    except IndexError:  # no-calls may only have one value even if >1 ALTs
+        return 0.0
     return _vaf_ad_dp(ad, dp)
 
 
