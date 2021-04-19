@@ -1,0 +1,7 @@
+##fileformat=VCFv4.3
+##contig=<ID=1,length=100>
+##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=NR,Number=.,Type=Integer,Description="Number of reads covering variant location in this sample">
+##FORMAT=<ID=NV,Number=.,Type=Integer,Description="Number of reads containing variant in this sample">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	Control1	Control2	Control3	Case1	Case2	Case3
