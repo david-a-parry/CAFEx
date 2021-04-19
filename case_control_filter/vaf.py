@@ -19,9 +19,9 @@ def _get_ad_vaf(record, sample, allele):
     try:
         ad = record.samples[sample]['AD']
         dp = sum(filter(None, ad))
+        return _vaf_ad_dp(ad[allele], dp)
     except IndexError:  # no-calls may only have one value even if >1 ALTs
         return 0.0
-    return _vaf_ad_dp(ad[allele], dp)
 
 
 def _get_svaba_vaf(record, sample, allele):
