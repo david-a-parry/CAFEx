@@ -11,8 +11,8 @@ def ad_to_nv(record):
     new_record = record.copy()
     for sample in record.samples:
         ads = record.samples[sample]['AD']
-        nr = [ads[0]] * (len(ads) - 1)
         nv = ads[1:]
+        nr = [ads[0] + sum(nv)] * (len(ads) - 1)
         new_record.samples[sample]['NR'] = nr
         new_record.samples[sample]['NV'] = nv
     del new_record.format['AD']
@@ -37,7 +37,6 @@ def ad_to_strelka(record):
     for sample in record.samples:
         ads = record.samples[sample]['AD']
         if len(record.ref) == len(record.alts[0]) == 1:
-            ntd = dict()
             for nt in 'ACGT':
                 if nt == record.ref:
                     n = ads[0]
@@ -49,7 +48,7 @@ def ad_to_strelka(record):
                 new_record.samples[sample][nt + 'U'] = (n, n + randint(0, 11))
         else:
             new_record.samples[sample]['TAR'] = (ads[0], ads[0] + randint(0, 9))
-            new_record.samples[sample]['TAR'] = (ads[1], ads[1] + randint(0, 9))
+            new_record.samples[sample]['TIR'] = (ads[1], ads[1] + randint(0, 9))
     del new_record.format['AD']
     return new_record
 
@@ -61,9 +60,11 @@ def ad_to_svaba(record):
         new_rec.alleles = (record.alleles[0], record.alleles[i])
         for sample in record.samples:
             ads = record.samples[sample]['AD']
-            new_rec.samples[sample]['AD'] = (ads[0], ads[i])
+            # hack to get around pysam complaining that it expects two values
+            new_rec.samples[sample]['AD'] = (ads[i], None)
             new_rec.samples[sample]['GT'] = tuple(1 if x == i else 0 for x in
                                                   record.samples[sample]['GT'])
+        new_rec = str(new_rec).replace(',.:', ':')
         new_records.append(new_rec)
     return new_records
 
