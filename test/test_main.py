@@ -265,7 +265,7 @@ def test_vaf_ratio():
                   ignore_genotypes=True,
                   output=out,
                   quiet=True)
-    expected_indices = [False, False, False, True, True, False, True, True,
+    expected_indices = [False, False, False, True, True, True, True, True,
                         False, False]
     expected_records = [x for x, y in zip(ad_records, expected_indices) if y]
     main(ad_vcf, **kwargs)
