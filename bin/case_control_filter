@@ -17,7 +17,7 @@ def get_options():
                         help='''Do not use GT calls for filtering. Use this
                         option to ignore genotype calls and only filter using
                         other options (below).''')
-    parser.add_argument('--case_expressions', nargs='+',
+    parser.add_argument('--case_expressions', nargs='+', metavar='EXPRESSION', 
                         help='''Require case sample genotypes to match each of
                         these expressions. If more than one --case sample is
                         provided, default behaviour is to require only one of
@@ -32,29 +32,30 @@ def get_options():
                         Parentheses are not supported. See the README for more
                         details.''')
     parser.add_argument('--control_expressions', nargs='+',
-                        help='''Require control sample genotypes to match each
-                        of these expressions. The same rules apply as for
-                        --case_expressions. For example, to only retain
-                        variants with an ALT AD less than 2 in all control
-                        samples use "AD < 2 all".''')
-    parser.add_argument('--min_case_vaf', type=float, help='''Minimum VAF for
-                        case genotypes. Filter variants unless at least one
-                        case sample has a VAF >= this value. VAF is
-                        calculated using standard AD FORMAT fields if present.
-                        Non-standard fields are supported for Platypus, Strelka
-                        and SvABA.''')
-    parser.add_argument('--max_control_vaf', type=float, help='''Maximum VAF
-                        for control genotypes. Filter variants if any control
-                        sample has a VAF >= this value. VAF is calculated using
-                        standard AD FORMAT fields if present. Non-standard
-                        fields are supported for Platypus, Strelka and
-                        SvABA''')
-    parser.add_argument('--vaf_ratio', type=float, help='''Filter variants if
-                        (case VAF) / (control VAF) is less than this value. If
-                        more than one sample is provided for case and/or
-                        control samples the VAF ration will be calculated from
-                        the samples with the maximum VAF. VAF is calcaulted as
-                        for --min_case_vaf/--max_control_vaf options.''')
+                        metavar='EXPRESSION', help='''Require control sample
+                        genotypes to match each of these expressions. The same
+                        rules apply as for --case_expressions. For example, to
+                        only retain variants with an ALT AD less than 2 in all
+                        control samples use "AD < 2 all".''')
+    parser.add_argument('--min_case_vaf', type=float, metavar='VAF',
+                        help='''Minimum VAF for case genotypes. Filter variants
+                        unless at least one case sample has a VAF >= this
+                        value. VAF is calculated using standard AD FORMAT
+                        fields if present. Non-standard fields are supported
+                        for Platypus, Strelka and SvABA.''')
+    parser.add_argument('--max_control_vaf', type=float, metavar='VAF',
+                        help='''Maximum VAF for control genotypes. Filter
+                        variants if any control sample has a VAF >= this value.
+                        VAF is calculated using standard AD FORMAT fields if
+                        present. Non-standard fields are supported for
+                        Platypus, Strelka and SvABA''')
+    parser.add_argument('--vaf_ratio', type=float, metavar='RATIO',
+                        help='''Filter variants if (case VAF) / (control VAF)
+                        is less than this value. If more than one sample is
+                        provided for case and/or control samples the VAF ration
+                        will be calculated from the samples with the maximum
+                        VAF. VAF is calcaulted as for
+                        --min_case_vaf/--max_control_vaf options.''')
     parser.add_argument('--info_tag', metavar='TAGNAME', help='''Add bitwise
                         flag with this tag to the INFO field of your output.
                         Bits are set in the flag indicating which ALT alleles
