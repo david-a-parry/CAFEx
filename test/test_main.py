@@ -287,3 +287,7 @@ def test_add_info_tag():
     if os.path.exists(out):
         os.remove(out)
 
+
+if __name__ == '__main__':
+    import nose
+    nose.run(defaultTest=__name__)

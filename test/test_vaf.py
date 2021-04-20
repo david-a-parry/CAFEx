@@ -132,3 +132,8 @@ def test_svaba_vaf_values():
             for j in range(len(rec.alts)):
                 result = _get_svaba_vaf(rec, c_id, j + 1)
                 assert_almost_equals(result, exp[i][j])
+
+
+if __name__ == '__main__':
+    import nose
+    nose.run(defaultTest=__name__)
