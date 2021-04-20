@@ -9,7 +9,7 @@ def get_options():
         other format fields.''')
     parser.add_argument('vcf', help='Input VCF file')
     parser.add_argument('-o', '--output', help='Output VCF/BCF file')
-    parser.add_argument('-t', '--case', '--tumor', nargs='+', default=[],
+    parser.add_argument('-t', '--case', nargs='+', default=[],
                         help='ID of case sample(s)')
     parser.add_argument('-n', '--control', nargs='+', default=[],
                         help='ID of control sample(s)')
