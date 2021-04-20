@@ -57,6 +57,9 @@ def main(vcf, case=[], control=[], output=None, ignore_genotypes=False,
         logger.setLevel(logging.WARN)
     elif debug:
         logger.setLevel(logging.DEBUG)
+    if not case and not control:
+        raise ValueError("At least one sample must be supplied to either" +
+                         "--case or --control options.")
     output = '-' if output is None else output
     with pysam.VariantFile(vcf) as variants:
         check_samples(variants, case + control)
@@ -84,8 +87,8 @@ def main(vcf, case=[], control=[], output=None, ignore_genotypes=False,
             for alt in range(n_alts):
                 allele = alt + 1
                 if not ignore_genotypes:
-                    if all(allele not in record.samples[x]['GT'] for x in
-                           case):
+                    if case and all(allele not in record.samples[x]['GT'] for x
+                                    in case):
                         filter_flag &= ~(1 << alt)  # unset bit for ALT allele
                     if any(allele in record.samples[x]['GT'] for x in control):
                         filter_flag &= ~(1 << alt)
