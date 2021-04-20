@@ -25,7 +25,8 @@ def test_missing_samples():
     kwargs = dict(case=['Case1', 'Case2', 'Case3', 'Case4'],
                   output=out)
     assert_raises(ValueError, main, ad_vcf, **kwargs)
-    kwargs['control'] = ['Control4']
+    kwargs = dict(control=['Control4'],
+                  output=out)
     assert_raises(ValueError, main, ad_vcf, **kwargs)
     if os.path.exists(out):
         os.remove(out)
