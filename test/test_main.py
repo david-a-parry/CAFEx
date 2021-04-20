@@ -19,6 +19,15 @@ def get_tmp_out(suffix='.vcf'):
     return fname
 
 
+def test_no_samples():
+    ''' Raise ValueError if no samples provided '''
+    out = get_tmp_out()
+    kwargs = dict(case=[], control=[], output=out)
+    assert_raises(ValueError, main, ad_vcf, **kwargs)
+    if os.path.exists(out):
+        os.remove(out)
+
+
 def test_missing_samples():
     ''' Raise ValueError on missing samples'''
     out = get_tmp_out()
@@ -249,6 +258,25 @@ def test_case_control_vaf():
 
 def test_vaf_ratio():
     ''' Filter on case/control VAF ratio '''
+    out = get_tmp_out()
+    kwargs = dict(case=['Case1'],
+                  control=['Control1'],
+                  vaf_ratio=10.0,
+                  ignore_genotypes=True,
+                  output=out,
+                  quiet=True)
+    expected_indices = [False, False, False, True, True, False, True, True,
+                        False, False]
+    expected_records = [x for x, y in zip(ad_records, expected_indices) if y]
+    main(ad_vcf, **kwargs)
+    results = get_variants(out)
+    assert_equal(results, expected_records)
+    if os.path.exists(out):
+        os.remove(out)
+
+
+def test_vaf_ratio_multi():
+    ''' Filter on multiple case/control VAF ratio '''
     out = get_tmp_out()
     kwargs = dict(case=['Case1', 'Case2'],
                   control=['Control1', 'Control2'],

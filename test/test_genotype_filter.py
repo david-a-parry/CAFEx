@@ -25,6 +25,43 @@ def check_filters(expected, expressions, vcf=ad_vcf):
             assert_equal(result, exp[i])
 
 
+def test_short_expression():
+    ''' Raise ValueError if expression too short'''
+    assert_raises(ValueError, _get_f_filter, ["AD 2"], ad_vcf)
+
+
+def test_hanging_expression():
+    ''' Raise ValueError if hanging values in expression'''
+    assert_raises(ValueError, _get_f_filter, ["AD > 2 DP 2"], ad_vcf)
+
+
+def test_invalid_min_match():
+    ''' Raise ValueError if minimum matching parameter is not a number > 0'''
+    assert_raises(ValueError, _get_f_filter, ["AD > 2 foo"], ad_vcf)
+    assert_raises(ValueError, _get_f_filter, ["AD > 2 0"], ad_vcf)
+    assert_raises(ValueError, _get_f_filter, ["AD > 2 -1"], ad_vcf)
+
+
+def test_invalid_operator():
+    ''' Raise ValueError if invalid operator used'''
+    assert_raises(ValueError, _get_f_filter, ["AD ^ 2"], ad_vcf)
+
+
+def test_invalid_logical_operator():
+    ''' Raise ValueError if invalid logical operator used'''
+    assert_raises(ValueError, _get_f_filter, ["AD > 2 xor DP < 20"], ad_vcf)
+
+
+def test_invalid_format_field():
+    ''' Raise ValueError if invalid FORMAT field used'''
+    assert_raises(ValueError, _get_f_filter, ["XX > 2"], ad_vcf)
+
+
+def test_invalid_value():
+    ''' Raise ValueError if invalid value type used'''
+    assert_raises(ValueError, _get_f_filter, ["AD != foo"], ad_vcf)
+
+
 def test_gq_single():
     ''' Number=1 '''
     expressions = ['GQ <= 50']

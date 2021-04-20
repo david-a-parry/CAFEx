@@ -12,7 +12,13 @@ nv_vcf = os.path.join(dir_path, 'test_data', 'nv_test.vcf')
 fb_vcf = os.path.join(dir_path, 'test_data', 'fb_test.vcf')
 svaba_vcf = os.path.join(dir_path, 'test_data', 'svaba_test.vcf')
 strelka_vcf = os.path.join(dir_path, 'test_data', 'strelka_test.vcf')
+no_vaf_vcf = os.path.join(dir_path, 'test_data', 'no_vaf_test.header.vcf')
 
+
+def test_no_vaf_field():
+    with pysam.VariantFile(no_vaf_vcf) as vcf:
+        assert_raises(ValueError, get_vaf_method, vcf)
+    
 
 def test_get_ad_vaf_method():
     with pysam.VariantFile(ad_vcf) as vcf:
