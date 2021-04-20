@@ -3,7 +3,7 @@ try:
 except ImportError:
     from distutils.core import setup
 import re
-v_file = "case_control_filter/version.py"
+v_file = "cafex/version.py"
 v_line = open(v_file, "rt").read()
 v_re = r"^__version__ = ['\"]([^'\"]*)['\"]"
 match = re.search(v_re, v_line, re.M)
@@ -13,17 +13,17 @@ else:
     raise RuntimeError("Unable to find version string in {}.".format(v_file))
 
 setup(
-    name="case_control_filter",
-    packages=["case_control_filter"],
+    name="cafex",
+    packages=["cafex"],
     version=verstr,
-    description="TODO - Project description",
+    description="Case control allele filtering with expressions",
     author="David A. Parry",
     author_email="david.parry@ed.ac.uk",
-    url='https://github.com/david-a-parry/case_control_filter',
-    download_url='https://github.com/david-a-parry/case_control_filter/archive/{}.tar.gz'.format(verstr),
+    url='https://github.com/david-a-parry/cafex',
+    download_url='https://github.com/david-a-parry/cafex/archive/{}.tar.gz'.format(verstr),
     license='MIT',
     install_requires=['pysam>=0.14'],
-    scripts=["bin/case_control_filter"],
+    scripts=["bin/cafex"],
     include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3",

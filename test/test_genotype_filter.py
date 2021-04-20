@@ -2,7 +2,7 @@ import os
 import pysam
 from nose.tools import *
 from .utils import get_variants
-from case_control_filter.genotype_filter import FormatFilter
+from cafex.genotype_filter import FormatFilter
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 ad_vcf = os.path.join(dir_path, 'test_data', 'ad_test.vcf')

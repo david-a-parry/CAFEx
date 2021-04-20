@@ -2,9 +2,9 @@ import os
 import pysam
 from nose.tools import *
 from .utils import get_variants
-from case_control_filter.vaf import get_vaf_method, _get_ad_vaf
-from case_control_filter.vaf import _get_platypus_vaf, _get_svaba_vaf
-from case_control_filter.vaf import _get_strelka_vaf, _get_freebayes_vaf
+from cafex.vaf import get_vaf_method, _get_ad_vaf
+from cafex.vaf import _get_platypus_vaf, _get_svaba_vaf
+from cafex.vaf import _get_strelka_vaf, _get_freebayes_vaf
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 ad_vcf = os.path.join(dir_path, 'test_data', 'ad_test.vcf')

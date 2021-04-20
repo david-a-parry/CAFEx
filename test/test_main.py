@@ -1,7 +1,7 @@
 import os
 import tempfile
 from nose.tools import *
-from case_control_filter.case_control_filter import main
+from cafex.case_control_filter import main
 from .utils import get_variants
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

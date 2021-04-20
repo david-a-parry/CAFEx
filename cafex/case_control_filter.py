@@ -2,11 +2,11 @@ import logging
 import pysam
 import sys
 import time
-from case_control_filter.bit_utils import set_first_bits
-from case_control_filter.vaf import get_vaf_method
-from case_control_filter.genotype_filter import FormatFilter
+from .bit_utils import set_first_bits
+from .vaf import get_vaf_method
+from .genotype_filter import FormatFilter
 
-PROG_NAME = "case_control_filter"
+PROG_NAME = "cafex"
 logger = logging.getLogger(PROG_NAME)
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter(

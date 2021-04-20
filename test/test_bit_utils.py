@@ -1,7 +1,7 @@
 from nose.tools import *
-from case_control_filter.bit_utils import first_n_bits_set, flag_consensus
-from case_control_filter.bit_utils import flip_bits, highest_set_bit
-from case_control_filter.bit_utils import set_bits_in_range, set_first_bits
+from cafex.bit_utils import first_n_bits_set, flag_consensus
+from cafex.bit_utils import flip_bits, highest_set_bit
+from cafex.bit_utils import set_bits_in_range, set_first_bits
 
 
 def test_first_n_bits_set():
