@@ -18,11 +18,11 @@ def get_options():
                         option to ignore genotype calls and only filter using
                         other options (below).''')
     parser.add_argument('--case_expressions', nargs='+',
-                        help='''Require case sample genotypes to match these
-                        expressions. If more than one case sample is provided,
-                        default behaviour is to require only one of these
-                        samples to match given expressions. For example, to
-                        only retain variants with a minimum GQ of 20 in at
+                        help='''Require case sample genotypes to match each of
+                        these expressions. If more than one --case sample is
+                        provided, default behaviour is to require only one of
+                        these samples to match given expressions. For example,
+                        to only retain variants with a minimum GQ of 20 in at
                         least one case sample use "GQ > 20". If you require 2
                         or more samples to match an expression add the minimum
                         number as the fourth part of your expression (e.g. "GQ
@@ -32,8 +32,8 @@ def get_options():
                         Parentheses are not supported. See the README for more
                         details.''')
     parser.add_argument('--control_expressions', nargs='+',
-                        help='''Require control sample genotypes to match
-                        these expressions. The same rules apply as for
+                        help='''Require control sample genotypes to match each
+                        of these expressions. The same rules apply as for
                         --case_expressions. For example, to only retain
                         variants with an ALT AD less than 2 in all control
                         samples use "AD < 2 all".''')
