@@ -42,13 +42,13 @@ def get_options():
                         unless at least one case sample has a VAF >= this
                         value. VAF is calculated using standard AD FORMAT
                         fields if present. Non-standard fields are supported
-                        for Platypus, Strelka and SvABA.''')
+                        for Freebayes, Platypus, Strelka and SvABA.''')
     parser.add_argument('--max_control_vaf', type=float, metavar='VAF',
                         help='''Maximum VAF for control genotypes. Filter
                         variants if any control sample has a VAF >= this value.
                         VAF is calculated using standard AD FORMAT fields if
                         present. Non-standard fields are supported for
-                        Platypus, Strelka and SvABA''')
+                        Freebayes, Platypus, Strelka and SvABA''')
     parser.add_argument('--vaf_ratio', type=float, metavar='RATIO',
                         help='''Filter variants if (case VAF) / (control VAF)
                         is less than this value. If more than one sample is
