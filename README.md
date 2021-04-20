@@ -62,13 +62,13 @@ optional arguments:
                         at least one case sample has a VAF >= this value. VAF
                         is calculated using standard AD FORMAT fields if
                         present. Non-standard fields are supported for
-                        Platypus, Strelka and SvABA.
+                        Freebayes, Platypus, Strelka and SvABA.
   --max_control_vaf VAF
                         Maximum VAF for control genotypes. Filter variants if
                         any control sample has a VAF >= this value. VAF is
                         calculated using standard AD FORMAT fields if present.
-                        Non-standard fields are supported for Platypus,
-                        Strelka and SvABA
+                        Non-standard fields are supported for Freebayes,
+                        Platypus, Strelka and SvABA
   --vaf_ratio RATIO     Filter variants if (case VAF) / (control VAF) is less
                         than this value. If more than one sample is provided
                         for case and/or control samples the VAF ration will be
