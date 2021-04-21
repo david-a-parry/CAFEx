@@ -6,7 +6,7 @@ from .bit_utils import set_first_bits
 from .vaf import get_vaf_method
 from .genotype_filter import FormatFilter
 
-PROG_NAME = "cafex"
+PROG_NAME = "CAFEx"
 logger = logging.getLogger(PROG_NAME)
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter(
