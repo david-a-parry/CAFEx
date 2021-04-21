@@ -62,6 +62,17 @@ def test_invalid_value():
     assert_raises(ValueError, _get_f_filter, ["AD != foo"], ad_vcf)
 
 
+def test_invalid_sum():
+    ''' Raise ValueError if attempt to sum non-subscriptable field'''
+    assert_raises(ValueError, _get_f_filter, ["sum(GQ) > 10"], ad_vcf)
+
+
+def test_invalid_subscript():
+    ''' Raise ValueError if attempt to subscript non-subscriptable field'''
+    assert_raises(ValueError, _get_f_filter, ["GQ[1] > 10"], ad_vcf)
+    assert_raises(ValueError, _get_f_filter, ["GQ[0] > 10"], ad_vcf)
+
+
 def test_gq_single():
     ''' Number=1 '''
     expressions = ['GQ <= 50']
@@ -110,6 +121,7 @@ def test_ad_single():
 
 
 def test_gq_all():
+    ''' Number=1 all samples matching '''
     expressions = ['GQ <= 50 all']
     expected = {
         ('Case1',): [1, 0, 1, 1, 0, 3, 1, 0, 1, 1],
@@ -122,6 +134,7 @@ def test_gq_all():
 
 
 def test_ad_multiple():
+    ''' Number=R with multiple samples matching '''
     expressions = ['AD > 3 2']
     expected = {
         ('Case1', 'Case2'): [1, 0, 1, 0, 1, 0, 0, 1, 0, 0],
@@ -133,6 +146,7 @@ def test_ad_multiple():
 
 
 def test_two_expressions():
+    ''' Multiple expressions '''
     expressions = ['AD > 3', 'GQ > 50']
     expected = {
         ('Case1',): [0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
@@ -144,6 +158,7 @@ def test_two_expressions():
 
 
 def test_gq_or_ad():
+    ''' Logical or '''
     expressions = ['AD > 3 or GQ > 50']
     expected = {
         ('Case1',): [1, 1, 1, 0, 1, 2, 1, 1, 0, 1],
@@ -155,6 +170,7 @@ def test_gq_or_ad():
 
 
 def test_gq_and_ad():
+    ''' Logical and '''
     expressions = ['AD > 3 and GQ > 50']
     expected = {
         ('Case1',): [0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
@@ -166,6 +182,7 @@ def test_gq_and_ad():
 
 
 def test_gq_and_ad_or_dp():
+    ''' Logical and plus or '''
     expressions = ['AD > 3 and GQ > 50 or DP > 20']
     expected = {
         ('Case1',): [0, 1, 0, 0, 1, 3, 1, 1, 0, 0],
@@ -177,6 +194,7 @@ def test_gq_and_ad_or_dp():
 
 
 def test_gq_and_ad_and_dp():
+    ''' Logical and times 2 '''
     expressions = ['AD > 3 and GQ > 50 and DP > 20']
     expected = {
         ('Case1',): [0, 0, 0, 0, 1, 0, 0, 1, 0, 0],
@@ -188,6 +206,39 @@ def test_gq_and_ad_and_dp():
     expressions = ['AD > 3 and GQ > 50 and DP > 20 2']
     expected = {
         ('Case1', 'Case2', 'Case3'): [1, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+    }
+    check_filters(expected, expressions)
+
+
+def test_sum_ad():
+    ''' Sum value comparison '''
+    expressions = ['sum(AD) == 20']
+    expected = {
+        ('Case1',): [1, 0, 1, 0, 0, 0, 0, 0, 1, 1],
+        ('Case2',): [0, 0, 0, 0, 0, 0, 1, 1, 0, 0],
+        ('Case3',): [0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+        ('Case1', 'Case2', 'Case3'): [1, 0, 1, 0, 1, 0, 1, 1, 1, 1],
+    }
+    check_filters(expected, expressions)
+    expressions = ['sum(AD) > 20 2']
+    expected = {
+        ('Case1', 'Case2', 'Case3'): [1, 0, 1, 0, 1, 3, 1, 1, 0, 1]
+    }
+    check_filters(expected, expressions)
+
+
+def test_subscript_ad():
+    ''' Subscripted value comparison '''
+    expressions = ['AD[1] == 30']
+    expected = {
+        ('Case1',): [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+        ('Case2',): [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+        ('Case3',): [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    }
+    check_filters(expected, expressions)
+    expressions = ['AD[1] >= 20 2']
+    expected = {
+        ('Case1', 'Case2', 'Case3'): [0, 0, 1, 0, 1, 0, 0, 0, 0, 0]
     }
     check_filters(expected, expressions)
 
