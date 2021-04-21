@@ -151,6 +151,7 @@ def test_expression_plus_genotypes():
     if os.path.exists(out):
         os.remove(out)
 
+
 def test_multiexpressions_plus_genotypes():
     ''' Filter cases using both genotypes and multiple expressions '''
     out = get_tmp_out()
@@ -177,6 +178,42 @@ def test_expressions_without_genotypes():
                   output=out,
                   quiet=True)
     expected_indices = [True, True, True, False, True, True, True, True, False,
+                        True]
+    expected_records = [x for x, y in zip(ad_records, expected_indices) if y]
+    main(ad_vcf, **kwargs)
+    results = get_variants(out)
+    assert_equal(results, expected_records)
+    if os.path.exists(out):
+        os.remove(out)
+
+
+def test_expressions_with_subscripted_field():
+    ''' Filter cases using a subscripted field '''
+    out = get_tmp_out()
+    kwargs = dict(case=['Case1', 'Case2', 'Case3'],
+                  case_expressions=["AD > 5"],
+                  ignore_genotypes=True,
+                  output=out,
+                  quiet=True)
+    expected_indices = [True, True, True, False, True, True, True, True, False,
+                        True]
+    expected_records = [x for x, y in zip(ad_records, expected_indices) if y]
+    main(ad_vcf, **kwargs)
+    results = get_variants(out)
+    assert_equal(results, expected_records)
+    if os.path.exists(out):
+        os.remove(out)
+
+
+def test_expressions_with_summed_values():
+    ''' Filter cases using a summed values '''
+    out = get_tmp_out()
+    kwargs = dict(case=['Case1', 'Case2', 'Case3'],
+                  case_expressions=["sum(AD) >= 30"],
+                  ignore_genotypes=True,
+                  output=out,
+                  quiet=True)
+    expected_indices = [True, False, True, False, True, True, True, True, True,
                         True]
     expected_records = [x for x, y in zip(ad_records, expected_indices) if y]
     main(ad_vcf, **kwargs)
