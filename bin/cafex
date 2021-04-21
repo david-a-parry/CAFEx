@@ -17,39 +17,39 @@ def get_options():
                         help='''Do not use GT calls for filtering. Use this
                         option to ignore genotype calls and only filter using
                         other options (below).''')
-    parser.add_argument('--case_expressions', nargs='+', metavar='EXPRESSION', 
-                        help='''Require case sample genotypes to match each of
-                        these expressions. If more than one --case sample is
-                        provided, default behaviour is to require only one of
-                        these samples to match given expressions. For example,
-                        to only retain variants with a minimum GQ of 20 in at
-                        least one case sample use "GQ > 20". If you require 2
-                        or more samples to match an expression add the minimum
-                        number as the fourth part of your expression (e.g. "GQ
-                        > 20 2"). If you require ALL cases to match an
-                        expression you can use "GQ > 20 all". You may also
-                        combine expressions with logical (and/or) operators.
-                        Parentheses are not supported. See the README for more
-                        details.''')
-    parser.add_argument('--control_expressions', nargs='+',
+    parser.add_argument('-x', '--case_expressions', nargs='+',
+                        metavar='EXPRESSION', help='''Require case sample
+                        genotypes to match each of these expressions. If more
+                        than one --case sample is provided, default behaviour
+                        is to require only one of these samples to match given
+                        expressions. For example, to only retain variants with
+                        a minimum GQ of 20 in at least one case sample use "GQ
+                        > 20". If you require 2 or more samples to match an
+                        expression add the minimum number as the fourth part of
+                        your expression (e.g. "GQ > 20 2"). If you require ALL
+                        cases to match an expression you can use "GQ > 20 all".
+                        You may also combine expressions with logical (and/or)
+                        operators. Parentheses are not supported. See the
+                        README for more details.''')
+    parser.add_argument('-y', '--control_expressions', nargs='+',
                         metavar='EXPRESSION', help='''Require control sample
                         genotypes to match each of these expressions. The same
                         rules apply as for --case_expressions. For example, to
                         only retain variants with an ALT AD less than 2 in all
                         control samples use "AD < 2 all".''')
-    parser.add_argument('--min_case_vaf', type=float, metavar='VAF',
+    parser.add_argument('-v', '--min_case_vaf', type=float, metavar='VAF',
                         help='''Minimum VAF for case genotypes. Filter variants
                         unless at least one case sample has a VAF >= this
                         value. VAF is calculated using standard AD FORMAT
                         fields if present. Non-standard fields are supported
                         for Freebayes, Platypus, Strelka and SvABA.''')
-    parser.add_argument('--max_control_vaf', type=float, metavar='VAF',
+    parser.add_argument('-w', '--max_control_vaf', type=float, metavar='VAF',
                         help='''Maximum VAF for control genotypes. Filter
                         variants if any control sample has a VAF >= this value.
                         VAF is calculated using standard AD FORMAT fields if
                         present. Non-standard fields are supported for
                         Freebayes, Platypus, Strelka and SvABA''')
-    parser.add_argument('--vaf_ratio', type=float, metavar='RATIO',
+    parser.add_argument('-y', '--vaf_ratio', type=float, metavar='RATIO',
                         help='''Filter variants if (case VAF) / (control VAF)
                         is less than this value. If more than one sample is
                         provided for case and/or control samples the VAF ration
@@ -60,10 +60,10 @@ def get_options():
                         flag with this tag to the INFO field of your output.
                         Bits are set in the flag indicating which ALT alleles
                         match all parameters provided by the user.''')
-    parser.add_argument('--progress_interval', type=int, metavar='N',
+    parser.add_argument('-p', '--progress_interval', type=int, metavar='N',
                         default=100_000, help='''Report progress every N
                         variants. Default=100_000.''')
-    parser.add_argument('--quiet', action='store_true', help='''Suppress
+    parser.add_argument('-q', '--quiet', action='store_true', help='''Suppress
                         progress messages and only show warnings.''')
     return parser.parse_args()
 
