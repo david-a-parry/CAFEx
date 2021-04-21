@@ -28,7 +28,7 @@ class FilterExpression(object):
         Args:
             expression:
                 Expression string that must consist of FORMAT field names,
-                operands and values for filtering. These triplets can be
+                operators and values for filtering. These triplets can be
                 optionally joined by 'and' or 'or' logical parameters if more
                 than one evaluation is to be performed. Optional final
                 parameter indicates how many samples must match the expression
@@ -84,13 +84,13 @@ class FilterExpression(object):
                              " required for expressions.")
         i = 0
         while i < len(split) - 2:
-            field, operand, value = split[i:i+3]
+            field, oprtr, value = split[i:i+3]
             try:
-                op = ops[operand]
+                op = ops[oprtr]
             except KeyError:
-                raise ValueError("Unrecognised operand '{}' ".format(operand) +
+                raise ValueError("Unrecognised operator '{}' ".format(oprtr) +
                                  "in filter expression '{} {} {}'".format(
-                                 field, operand, value))
+                                 field, oprtr, value))
             if field not in self.metadata:
                 raise ValueError("FORMAT field '{}' not in VCF ".format(field) +
                                  "header - can not be used for FORMAT field " +
@@ -160,7 +160,7 @@ class FormatFilter(object):
             vcf: VariantFile object from pysam.
 
             expressions:
-                 iterable of tuples of field names, operands and values for
+                 iterable of tuples of field names, operators and values for
                  filtering. Optional fourth parameter indicates how many
                  samples parameter has to match (either an integer or 'all' are
                  acceptable). By default only one sample passed to the 'filter'
@@ -176,7 +176,7 @@ class FormatFilter(object):
         '''
             Args:
                 expressions:
-                    iterable of tuples of field names, operands and values for
+                    iterable of tuples of field names, operators and values for
                     filtering. Optional fourth parameter indicates how many
                     samples parameter has to match (either an integer or 'all'
                     are acceptable). By default only one sample passed to the
