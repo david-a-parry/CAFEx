@@ -4,10 +4,10 @@ from collections import namedtuple
 from .bit_utils import first_n_bits_set, set_first_bits, flag_consensus
 
 Expression = namedtuple("Expression",
-                        "field operator value number sum subscript")
+                        "field operator value number iterfunc subscript")
 
 _subscript_re = re.compile(r'(\w+)\[(\d+)\]')
-_sum_re = re.compile(r'sum\((\w+)\)')
+_iter_re = re.compile(r'(sum|min|max)\((\w+)\)')
 
 ops = {
     ">": operator.gt,
@@ -18,6 +18,12 @@ ops = {
     "!=": operator.ne,
     "=": operator.eq,
     "!": operator.ne,
+}
+
+iter_funcs = {
+    "sum": sum,
+    "min": min,
+    "max": max
 }
 
 logical = {  # we use bitwise operators because we will be comparing flags
@@ -63,8 +69,8 @@ class FilterExpression(object):
             val = None
             if exp.number == 1:
                 val = annot
-            elif exp.sum:
-                val = sum(filter(None, annot))
+            elif exp.iterfunc is not None:
+                val = exp.iterfunc(filter(lambda x: x is not None, annot))
             elif exp.subscript is not None:
                 val = annot[exp.subscript]
             if val is not None and exp.operator(val, exp.value):
@@ -77,9 +83,18 @@ class FilterExpression(object):
                 else:
                     alt_vals = annot
                 for i in range(n_alts):
-                    if alt_vals[i] is not None and exp.operator(alt_vals[i],
-                                                                exp.value):
-                        flg |= 1 << i  # set bit for ALT allele
+                    try:
+                        if alt_vals[i] is not None and exp.operator(
+                                alt_vals[i], exp.value):
+                            flg |= 1 << i  # set bit for ALT allele
+                    except IndexError:
+                        if _ext_logger:
+                            _ext_logger.warning(
+                                ("Not enough values for sample '{}' field " +
+                                 "'{}' at {}:{}").format(smpl,
+                                                         exp.field,
+                                                         record.chrom,
+                                                         record.pos))
             else:
                 for x in annot:
                     if x is not None and exp.operator(x, exp.value):
@@ -108,16 +123,17 @@ class FilterExpression(object):
                 raise ValueError("Unrecognised operator '{}' ".format(oprtr) +
                                  "in filter expression '{}'".format(expression)
                                  )
-            do_sum = False
+            iter_func = None
             subscript = None
             sub_match = _subscript_re.match(field)
-            sum_match = _sum_re.match(field)
+            iter_match = _iter_re.match(field)
             if sub_match is not None:
                 field = sub_match.group(1)
                 subscript = int(sub_match.group(2))
-            elif sum_match is not None:
-                field = sum_match.group(1)
-                do_sum = True
+            elif iter_match is not None:
+                iter_name = iter_match.group(1)
+                iter_func = iter_funcs[iter_name]
+                field = iter_match.group(2)
             if field not in self.metadata:
                 raise ValueError("FORMAT field '{}' not in VCF ".format(field) +
                                  "header - can not be used for FORMAT field " +
@@ -139,9 +155,10 @@ class FilterExpression(object):
                                      "in VCF header.")
             num = self.metadata[field].number
             if num == 1:
-                if do_sum:
-                    raise ValueError("Cannot use 'sum' in expression '" +
-                                     expression + "'. Only expect one value" +
+                if iter_func:
+                    raise ValueError("Cannot use '{}' in '".format(iter_name) +
+                                     "expression " + expression +
+                                     "'. Only expect one value" +
                                      "(Number=1) for field '{}'.".format(field)
                                      )
                 if subscript is not None:
@@ -156,8 +173,8 @@ class FilterExpression(object):
                                          .format(field) + " expression '" +
                                          expression + "'. Expect {} values."
                                          .format(num))
-            self.expressions.append(Expression(field, op, value, num, do_sum,
-                                               subscript))
+            self.expressions.append(Expression(field, op, value, num,
+                                               iter_func, subscript))
             if len(split) >= i + 7:  # logical operator + another expression
                 logic = split[i+3]
                 if logic not in logical:

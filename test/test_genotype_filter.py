@@ -227,6 +227,40 @@ def test_sum_ad():
     check_filters(expected, expressions)
 
 
+def test_max_ad():
+    ''' Max value comparison '''
+    expressions = ['max(AD) >= 25']
+    expected = {
+        ('Case1',): [0, 0, 0, 0, 1, 0, 1, 1, 0, 0],
+        ('Case2',): [0, 0, 0, 0, 1, 0, 0, 0, 1, 1],
+        ('Case3',): [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+        ('Case1', 'Case2', 'Case3'): [0, 0, 0, 0, 1, 0, 1, 1, 1, 1],
+    }
+    check_filters(expected, expressions)
+    expressions = ['max(AD) >= 25 2']
+    expected = {
+        ('Case1', 'Case2', 'Case3'): [0, 0, 0, 0, 1, 0, 1, 0, 0, 0]
+    }
+    check_filters(expected, expressions)
+
+
+def test_min_ad():
+    ''' Min value comparison '''
+    expressions = ['min(AD) < 5']
+    expected = {
+        ('Case1',): [0, 0, 1, 1, 1, 3, 0, 1, 1, 0],
+        ('Case2',): [0, 1, 0, 1, 1, 3, 1, 0, 1, 1],
+        ('Case3',): [0, 1, 1, 1, 1, 3, 1, 0, 1, 0],
+        ('Case1', 'Case2', 'Case3'): [0, 1, 1, 1, 1, 3, 1, 1, 1, 1],
+    }
+    check_filters(expected, expressions)
+    expressions = ['min(AD) < 5 2']
+    expected = {
+        ('Case1', 'Case2', 'Case3'): [0, 1, 1, 1, 1, 3, 1, 0, 1, 0]
+    }
+    check_filters(expected, expressions)
+
+
 def test_subscript_ad():
     ''' Subscripted value comparison '''
     expressions = ['AD[1] == 30']
