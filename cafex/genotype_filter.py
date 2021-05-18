@@ -33,6 +33,8 @@ logical = {  # we use bitwise operators because we will be comparing flags
     "||": operator.ior,
 }
 
+_ext_logger = None
+
 
 class FilterExpression(object):
     ''' A class for holding expression logic for testing genotype values'''
@@ -217,7 +219,7 @@ class FormatFilter(object):
     A class for filtering on given FORMAT fields in a VCF
     '''
 
-    def __init__(self, vcf, expressions):
+    def __init__(self, vcf, expressions, logger=None):
         '''
         Args:
             vcf: VariantFile object from pysam.
@@ -233,6 +235,8 @@ class FormatFilter(object):
         self.vcf = vcf
         self.fields = set()
         self.expressions = []
+        global _ext_logger
+        _ext_logger = logger
         self._parse_expressions(expressions)
 
     def _parse_expressions(self, expressions):

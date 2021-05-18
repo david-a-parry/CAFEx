@@ -27,7 +27,7 @@ def check_samples(vcf, samples):
 def get_format_filter(vcf, expressions):
     if not expressions:
         return None
-    return FormatFilter(vcf=vcf, expressions=expressions)
+    return FormatFilter(vcf=vcf, expressions=expressions, logger=logger)
 
 
 def get_max_vafs(record, samples, vaf_func):
