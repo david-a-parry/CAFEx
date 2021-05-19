@@ -72,7 +72,7 @@ class FilterExpression(object):
             if exp.number == 1:
                 val = annot
             elif exp.iterfunc is not None:
-                val = exp.iterfunc(filter(lambda x: x is not None, annot))
+                val = exp.iterfunc(x for x in annot if x is not None)
             elif exp.subscript is not None:
                 val = annot[exp.subscript]
             if val is not None and exp.operator(val, exp.value):
