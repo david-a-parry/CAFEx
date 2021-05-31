@@ -237,19 +237,6 @@ class FormatFilter(object):
         self.expressions = []
         global _ext_logger
         _ext_logger = logger
-        self._parse_expressions(expressions)
-
-    def _parse_expressions(self, expressions):
-        '''
-            Args:
-                expressions:
-                    iterable of tuples of field names, operators and values for
-                    filtering. Optional fourth parameter indicates how many
-                    samples parameter has to match (either an integer or 'all'
-                    are acceptable). By default only one sample passed to the
-                    'filter' method needs match an expression.
-        '''
-        f = []
         for expression in expressions:
             self.expressions.append(FilterExpression(expression, self.vcf))
 
