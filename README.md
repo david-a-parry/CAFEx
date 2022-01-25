@@ -11,7 +11,7 @@ Filter variants in a VCF based on case/control genotype metrics.
 
 ## Usage
 
-Detailed Usage to Follow:
+CAFEx allows you to filter VCF/BCFs using expressions relating to sample genotype fields. You can specify different filtering expressions for cases and controls and for each expression you  may optionally specify whether you need a minimum number of samples or all case/control samples to match that expression.
 
 ```
 usage: cafex [-h] [-o OUTPUT] [-t CASE [CASE ...]] [-n CONTROL [CONTROL ...]]
@@ -82,3 +82,36 @@ optional arguments:
                         Report progress every N variants. Default=100_000.
   --quiet               Suppress progress messages and only show warnings.
 ```
+
+### Examples:
+
+Identify possible de novos in parent-child trio sequencing:
+```
+cafex input.vcf.gz \
+    --case child \
+    --control mum dad \
+    --min_case_vaf 0.25 \
+    --max_control_vaf 0.05 \
+    --vaf_ratio 10 \
+    --case_expressions "DP >= 10 and GQ >= 30 and AD > 3" \
+    --control_expressions "DP >= 10 1" "GQ > 20 all" \
+    --output output.vcf.gz
+```
+
+Identify possible somatic mutations in cancer/normal sequencing:
+```
+cafex input.vcf.gz \
+    --case tumour \
+    --control normal1 normal2 \
+    --vaf_ratio 10 \
+    --case_expressions "DP >= 10 and AD > 2" \
+    --control_expressions "DP >= 20 1" and AD < 2 all" \
+    --output output.vcf.gz
+```
+
+
+## Author
+
+David A. Parry
+
+University of Edinburgh
